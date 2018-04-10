@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+
+    <title>Контроллер Романа</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="table.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/js/fancybox/jquery.fancybox.css" rel="stylesheet" />
+
+    <!-- Just for debugging purposes. Dont actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+ <body data-spy="scroll" data-offset="0" data-target="#theMenu">
+
+	<!-- Menu -->
+	<nav class="menu" id="theMenu">
+		<div class="menu-wrap">
+			<h1 class="logo"><a href="#home">На главную</a></h1>
+			<i class="fa fa-times menu-close"></i>
+			<a href="#services" class="smoothScroll">Настройки</a>
+
+		</div>
+
+		<!-- Menu button -->
+		<div id="menuToggle"><i class="fa fa-bars"></i></div>
+	</nav>
+
+ <section id="about" name="about"></section>
+	<div id="aboutwrap">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4 name" >
+
+
+
+<table id="customers" align=center   >
+
+
+<?php
+ require_once 'functions.php';
+$heater_selector="";
+$collector_selector="";
+$boiler_selector="";
+for($i=0;$i<count($modes)-1;$i++){
+    $val = array_search("m".$i,$modes);
+
+    $heater_selector.= "<option";
+    if($data[heater_mode]=="m".$i)
+        $heater_selector.= " selected";
+    $heater_selector.= " value=\"m$i\">$val</option>\n";
+
+    $collector_selector.= "<option";
+    if($data[collector_mode]=="m".$i)
+        $collector_selector.= " selected";
+    $collector_selector.= " value=\"m$i\">$val</option>\n";
+
+    $boiler_selector.= "<option";
+    if($data[boiler_mode]=="m".$i)
+        $boiler_selector.= " selected";
+    $boiler_selector.= " value=\"m$i\">$val</option>\n";
+}
+
+
+
+
+echo "
+
+    <tr>
+        <td>
+            Котел:<br/>
+            $data[heater_temp]&deg;C,&nbsp;".array_search($data[heater_mode],$modes)."
+         </td>
+         <td>
+            Коллектор:<br/>
+            $data[collector_temp]&deg;C,&nbsp;".array_search($data[collector_mode],$modes)."
+         </td>
+         <td>
+            Нагреватель:<br/>
+            $data[boiler_temp]&deg;C,&nbsp;".array_search($data[boiler_mode],$modes)."
+         </td>
+    </tr>
+
+
+
+</table>
+	</div><! --/col-lg-8-->
+
+			</div><!-- /row -->
+		</div><!-- /container -->
+	</div><!-- /aboutwrap -->
+
+
+
+	<! -- SERVICE SECTION -->
+	<section id=\"services\" name=\"services\"></section>
+	<div id=\"servicewrap\">
+		<div class=\"container\">
+			<div class=\"row\">
+				<div class=\"col-lg-8-offset-2 centered\">
+					<h2>Настройки</h2>
+				</div><!-- /col-lg-8 -->
+			</div><! --/row -->
+
+			<div class=\"row mt\">
+				<div class=\"col-lg-3 service\">
+         <form action= save_settings.php method=post>
+        <table id=\"customers\" align=center   >
+          <tr>
+          <td >
+            Котел:<br/>
+
+           <select  name=\"heater_mode\" id=\"heater_mode\">
+
+                   $heater_selector
+           </select>
+          </td>
+          <td>
+            Коллектор:<br/>
+
+             <select  name=\"collector_mode\" id=\"collector_mode\">
+
+                   $collector_selector
+           </select>
+         </td>
+         <td>
+            Нагреватель:<br/>
+             <select  name=\"boiler_mode\" id=\"boiler_mode\">
+
+                   $boiler_selector
+             </select>
+
+         </td>
+    </tr>
+
+    </table>
+    </form>
+    <script>
+    ";
+
+?>
+
+
+
+      var e1 = document.getElementById("heater_mode");
+      e1.onchange = send;
+
+      var e2 = document.getElementById("collector_mode");
+            e2.onchange = send;
+
+      var e3 = document.getElementById("boiler_mode");
+            e3.onchange = send;
+
+
+
+   function send(){
+       var data = {};
+       var e1 = document.getElementById("heater_mode");
+
+      var heater_mode = e1.selectedIndex;
+      var e2 = document.getElementById("collector_mode");
+
+      var collector_mode = e2.selectedIndex;
+      var e3 = document.getElementById("boiler_mode");
+
+      var boiler_mode = e3.selectedIndex;
+      data.dataType = 'change_mode';
+      data.heater_mode    = "m"+heater_mode;
+      data.collector_mode = "m"+collector_mode;
+      data.boiler_mode    = "m"+boiler_mode;
+
+
+      console.log("data.heater_mode="+e1.selectedIndex+"|"+data.heater_mode);
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'save.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+      // send the collected data as JSON
+      xhr.send(JSON.stringify(data));
+
+      xhr.onloadend = function () {
+              console.log("onloadeEnd");
+      get_values();
+      };
+    }
+
+    function get_values(){
+        console.log("get_values");
+        window.location.reload();
+    }
+    </script>
+				</div>
+
+			</div><! --/row -->
+
+
+		</div><! --/container -->
+	</div><! --/servicewrap -->
+
+
+	<! -- SERVICE SECTION -->
+          <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="assets/js/classie.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/smoothscroll.js"></script>
+	<script src="assets/js/jquery.stellar.min.js"></script>
+	<script src="assets/js/fancybox/jquery.fancybox.js"></script>
+	<script src="assets/js/main.js"></script>
+		<script>
+		$(function(){
+			$.stellar({
+				horizontalScrolling: false,
+				verticalOffset: 40
+			});
+		});
+		</script>
+
+		<script type="text/javascript">
+      $(function() {
+        //    fancybox
+          jQuery(".fancybox").fancybox();
+      });
+	   </script>
+
+
+  </body>
+</html>
